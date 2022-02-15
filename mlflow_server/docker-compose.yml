@@ -1,0 +1,44 @@
+version: '3.5'
+
+services:
+  db:
+    restart: always
+    image: postgres:13.5-alpine
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hvzn12345}
+      PGDATA: /data/postgres
+    volumes:
+       - postgres:/data/postgres
+    ports:
+      - "5432"
+    networks:
+      - mlflow
+
+
+  mlflow_server:
+    restart: always
+    build: ./mlflow
+    image: mlflow_server
+    container_name: mlflow_server
+    ports:
+      - "5001:5000" # port exposed:port internal
+    volumes:
+      - ./mlflow/model_storage:/opt/src/app/mlflow
+    networks:
+      - mlflow
+    depends_on:
+      - db
+    environment:
+      BACKEND_STORE_URI: postgresql://postgres:hvzn12345@db:5432/postgres
+      ARTIFACT_STORE: gs://hvzn-gcs-us-1/mlflow-1
+
+
+networks:
+  mlflow:
+    driver: bridge
+
+volumes:
+    postgres:
+    mlflow:

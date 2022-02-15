@@ -1,0 +1,10 @@
+FROM python:3.7.12-slim-buster
+
+COPY mlflow-storage-gcs.json ./gcs.json
+ENV GOOGLE_APPLICATION_CREDENTIALS=gcs.json
+
+RUN pip install --upgrade pip
+RUN pip install mlflow boto3 psycopg2-binary
+RUN pip install google-cloud-storage
+
+ENTRYPOINT mlflow server --backend-store-uri $BACKEND_STORE_URI --default-artifact-root $ARTIFACT_STORE --host 0.0.0.0
