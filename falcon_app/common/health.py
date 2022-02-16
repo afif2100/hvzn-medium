@@ -1,5 +1,8 @@
-from datetime import datetime
 import falcon
+from datetime import datetime
+from common.base_logger import BaseLogger
+
+log = BaseLogger(__name__)
 
 
 class HealthCheck(object):
