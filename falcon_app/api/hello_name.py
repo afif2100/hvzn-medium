@@ -1,4 +1,3 @@
-from tkinter.messagebox import NO
 import falcon
 import json
 from common.base_logger import BaseLogger

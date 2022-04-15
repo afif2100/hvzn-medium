@@ -1,11 +1,6 @@
-FROM python:3.7.12-slim-buster
+FROM afif2100/docker-base:latest
+RUN pip install -r requirements.txt
 
-
-RUN mkdir /opt/src/app/
-WORKDIR /opt/src/app/
-COPY . /opt/src/app/
-
-RUN pip install --upgrade pip
-RUN pip install -r requirement.txt
+COPY . $WORKDIR
 
 CMD ["bash", "run_app.sh"]
