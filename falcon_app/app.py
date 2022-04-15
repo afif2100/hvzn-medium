@@ -1,5 +1,5 @@
 import falcon
-from common.health import HealthCheck
+from helper.health import HealthCheck
 from api.hello_name import HelloName
 from middleware import PrometheusMiddleware
 

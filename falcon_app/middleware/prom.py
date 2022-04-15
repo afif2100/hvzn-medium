@@ -1,4 +1,5 @@
-from prometheus_client import CollectorRegistry, Counter, Histogram, generate_latest
+from prometheus_client import CollectorRegistry, generate_latest
+from prometheus_client import Counter, Histogram
 import time
 
 
