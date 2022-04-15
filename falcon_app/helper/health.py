@@ -3,6 +3,7 @@ import falcon
 from datetime import datetime
 from common.base_logger import BaseLogger
 from common import RedisConnection, PostgressConnection
+import os
 
 log = BaseLogger(__name__)
 
@@ -18,11 +19,14 @@ class HealthCheck(object):
         """
         now_time = datetime.now()
         delta_time = now_time - self.start_time
+        db_check_enable = eval(os.environ.get('ENABLE_DB_CHECK', False))
 
-        return {"message": "ok",
-                "uptime": str(delta_time),
-                "db": self._get_db_status()
-                }
+        payload = {"message": "ok",
+                   "uptime": str(delta_time)
+                   }
+        if db_check_enable:
+            payload.update({"db": self._get_db_status()})
+        return payload
 
     def _get_db_status(self):
         db_status = {}
