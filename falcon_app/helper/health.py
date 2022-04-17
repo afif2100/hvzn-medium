@@ -19,7 +19,7 @@ class HealthCheck(object):
         """
         now_time = datetime.now()
         delta_time = now_time - self.start_time
-        db_check_enable = eval(os.environ.get('ENABLE_DB_CHECK', False))
+        db_check_enable = eval(os.environ.get('ENABLE_DB_CHECK', "False"))
 
         payload = {"message": "ok",
                    "uptime": str(delta_time)

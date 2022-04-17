@@ -2,6 +2,7 @@ FROM python:3.8.10-slim-buster
 
 RUN apt-get update && \
     apt-get -y install gcc mono-mcs manpages-dev git make
+USER root
 
 ENV WORKDIR=/usr/src/app
 
@@ -17,3 +18,4 @@ RUN mkdir /.local && \
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+RUN pip install redis

@@ -1,5 +1,6 @@
 import redis
 from common.base_logger import BaseLogger
+import os
 
 logger = BaseLogger('redis')
 
@@ -7,12 +8,14 @@ logger = BaseLogger('redis')
 class RedisConnection(object):
 
     def __init__(self):
-        self.host = "localhost"
-        self.password = ""
-        self.port = 6379
+        self.host = os.environ.get("REDIS_HOST", "localhost")
+        self.user = os.environ.get("REDIS_USER", "")
+        self.password = os.environ.get("REDIS_PASSWORD", "")
+        self.port = int(os.environ.get("REDIS_PORT", 6379))
 
     def connectdb(self):
         self.red = redis.Redis(host=self.host,
+                               username=self.user,
                                port=self.port,
                                password=self.password)
 

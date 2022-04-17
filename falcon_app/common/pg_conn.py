@@ -9,7 +9,7 @@ class PostgressConnection(object):
     def __init__(self):
         self.host = "localhost"
         self.user = "postgres"
-        self.password = "hvzn12345"
+        self.password = ""
         self.db= "postgres"
         self.port = 5432
 
