@@ -41,7 +41,7 @@ jobs:
       run: |
         conda activate test && python -m pip install --upgrade pip
         pip install coverage pytest setuptools wheel
-        pip install gcsfs
+        pip install gcsfs numpy pandas
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Test with pytest
