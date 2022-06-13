@@ -28,9 +28,6 @@ jobs:
     - name: 'Use gcloud CLI'
       run: 'gcloud info'
 
-    - name: check gcs ls
-      run: "gsutil ls gs://hvzn-gcs-us-1"
-
     - name: Set up Python ${{ matrix.python-version }}
       uses: conda-incubator/setup-miniconda@v2.1.1
       with:
