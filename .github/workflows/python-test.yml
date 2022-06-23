@@ -43,12 +43,11 @@ jobs:
       shell: bash -l {0}
       run: |
         conda activate test && python -m pip install --upgrade pip
-        pip install coverage pytest setuptools wheel
+        pip install setuptools wheel
+        pip install pytest pytest-cov
         pip install gcsfs numpy pandas
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Test with pytest
       shell: bash -l {0}
       run: |
-        conda activate test && coverage run --source=hvzn -m pytest -o log_cli=true -v tests
-        coverage report -m
+        conda activate test && pytest
