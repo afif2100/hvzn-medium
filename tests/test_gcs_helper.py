@@ -8,7 +8,7 @@ from gcp_storage_emulator.server import create_server
 
 # Start Storage emulator
 os.environ["STORAGE_EMULATOR_HOST"] = f"http://{HOST}:{PORT}"
-server = create_server(HOST, PORT, default_bucket=BUCKET, in_memory=True)
+server = create_server(HOST, PORT, default_bucket=BUCKET, in_memory=False)
 gcs = GcsHelper()
 
 
