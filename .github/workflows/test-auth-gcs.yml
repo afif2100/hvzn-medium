@@ -1,5 +1,5 @@
 
-name: Python package
+name: Github Action auth GCS
 
 on:
   - pull_request
