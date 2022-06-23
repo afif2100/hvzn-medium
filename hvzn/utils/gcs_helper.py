@@ -6,11 +6,11 @@ class GcsHelper:
     def __init__(self) -> None:
         self.fs = gcsfs.GCSFileSystem()
 
-    def save_pkl_to_gcs(self, gcs_path, object):
+    def save_pkl_to_gcs(self, gcs_path, object) -> None:
         with self.fs.open(gcs_path, "wb") as f:
             pickle.dump(object, f)
 
-    def read_pkl_from_gcs(self, gcs_path):
+    def read_pkl_from_gcs(self, gcs_path) -> None:
         with self.fs.open(gcs_path, "rb") as f:
             return pickle.load(f)
 
