@@ -9,6 +9,8 @@ from gcp_storage_emulator.server import create_server
 # Start Storage emulator
 os.environ["STORAGE_EMULATOR_HOST"] = f"http://{HOST}:{PORT}"
 server = create_server(HOST, PORT, default_bucket=BUCKET, in_memory=True)
+gcs = GcsHelper()
+
 
 @pytest.fixture
 def payload():
@@ -24,7 +26,7 @@ def test_save_pkl(payload):
     # save pkl
     arr = payload['data']
     gcs_path = payload['path']
-    gcs = GcsHelper()
+
     gcs.save_pkl_to_gcs(gcs_path=gcs_path, object=arr)
     assert gcs.check_gcs_exist(gcs_path) == True
 
@@ -33,14 +35,14 @@ def test_load_pkl(payload):
     arr = payload['data']
     gcs_path = payload['path']
 
-    gcs = GcsHelper()
     loaded_array = gcs.read_pkl_from_gcs(gcs_path=gcs_path)
     assert np.array_equal(arr, loaded_array) == True
 
 def test_delete_file(payload):
     # delete file
+    arr = payload['data']
     gcs_path = payload['path']
-    gcs = GcsHelper()
+
     gcs.delete_gcs_file(gcs_path)
     assert gcs.check_gcs_exist(gcs_path) == False
 
