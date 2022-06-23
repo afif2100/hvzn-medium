@@ -28,6 +28,9 @@ jobs:
     - name: 'Use gcloud CLI'
       run: 'gcloud info'
 
+    - name: 'Use gsutil LS'
+      run: ' gsutil ls gs://hvzn-gcs-us-1'
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
