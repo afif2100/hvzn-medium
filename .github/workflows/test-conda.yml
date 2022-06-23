@@ -1,7 +1,8 @@
 
 name: Python package
 
-on: ['pull_requests']
+on:
+  - pull_request
 
 jobs:
   build:
