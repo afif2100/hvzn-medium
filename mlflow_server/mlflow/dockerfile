@@ -1,4 +1,5 @@
-FROM python:3.7.12-slim-buster
+# FROM python:3.7.12-slim-buster
+FROM python:3.10.7-slim-buster
 
 COPY mlflow-storage-gcs.json ./gcs.json
 ENV GOOGLE_APPLICATION_CREDENTIALS=gcs.json

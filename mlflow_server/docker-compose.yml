@@ -3,7 +3,7 @@ version: '3.5'
 services:
   db:
     restart: always
-    image: postgres:13.5-alpine
+    image: postgres:14.5
     container_name: postgres_container
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
