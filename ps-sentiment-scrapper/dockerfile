@@ -1,0 +1,8 @@
+FROM afif2100/docker-base:latest
+
+USER $USER
+COPY . $WORKDIR
+
+RUN pip install -r requirements.txt
+
+CMD [ "python", "get-data-ingestion-predict.py" ]

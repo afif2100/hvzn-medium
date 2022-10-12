@@ -1,0 +1,9 @@
+transformers==4.22.2
+torch==1.12.1
+SQLAlchemy==1.4.41
+simager==0.1.1
+emoji==1.7.0
+google-play-scraper==1.2.2
+psycopg2-binary==2.9.3
+pandas==1.5.0
+pandas-gbq==0.17.9

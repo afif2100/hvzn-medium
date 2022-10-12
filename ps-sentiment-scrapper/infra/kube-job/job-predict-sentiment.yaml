@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: predict-sentiment-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: predict-sentiment
+        image: afif2100/sentiment-batch-job:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: PG_HOST
+          value: "kube-db-postgresql.default.svc.cluster.local"
+        - name: PG_DATABASE
+          value: "playstore"
+        - name: PG_PASS
+          valueFrom:
+            secretKeyRef:
+              name: kube-db-postgresql
+              key: postgres-password
+      restartPolicy: Never # OnFailure
