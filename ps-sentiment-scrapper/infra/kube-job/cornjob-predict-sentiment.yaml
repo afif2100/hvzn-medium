@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: predict-sentiment
 spec:
-  schedule: "10 * * * *"
+  schedule: "* */12 * * *"
   jobTemplate:
     spec:
       template:
