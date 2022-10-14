@@ -32,3 +32,19 @@ DELETE  FROM
 WHERE
     a."index" > b."index"
     AND a."reviewId" = b."reviewId";
+
+
+-- Delete invalid review
+SELECT * from sentiment
+LEFT join review
+ON "sentiment"."reviewId" = "review"."reviewId"
+WHERE "review"."reviewId" is NULL;
+
+
+DELETE FROM sentiment 
+WHERE "reviewId"
+in (SELECT "sentiment"."reviewId" from sentiment
+	LEFT join review
+	ON "sentiment"."reviewId" = "review"."reviewId"
+	WHERE "review"."reviewId" is NULL
+	);
