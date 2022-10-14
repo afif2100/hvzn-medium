@@ -1,10 +1,5 @@
 from matplotlib.pyplot import table
 import pandas as pd
-import psycopg2
-import dateutil.parser
-from sqlalchemy import create_engine
-from tqdm import tqdm, trange
-import datetime
 from sqlalchemy import create_engine
 from helper import get_review_ps
 from helper import SentimentPredictor
