@@ -87,7 +87,7 @@ if __name__ == "__main__":
     preds = SentimentPredictor()
 
     # insert data
-    app_ids = ["com.bca", "id.bmri.livin", "id.co.bri.brimo"]
+    app_ids = ["id.co.bri.brimo", "com.bca", "id.bmri.livin"]
     for app in app_ids:
         get_review_and_insert(
             app_id=app, n=5000, engine=preds.db_engine, conn=preds.db_conn
