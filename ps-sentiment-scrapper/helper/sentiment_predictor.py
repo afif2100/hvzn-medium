@@ -39,10 +39,16 @@ class SentimentPredictor:
         # psql engine
         self.db_conn = psycopg2.connect(
             host=connection_info["host"],
+            port=connection_info["port"],
             database=connection_info["db"],
             user=connection_info["user"],
             password=connection_info["password"],
         )
+
+        print("-" * 5 * 20)
+        self.db_engine.connect()
+        print("Postgress connection success!")
+        print("-" * 5 * 20)
 
     def _load_model(self):
         # sentiment model
