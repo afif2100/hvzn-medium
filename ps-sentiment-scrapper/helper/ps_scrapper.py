@@ -1,6 +1,7 @@
 import pandas as pd
 from time import sleep
 from google_play_scraper import Sort, reviews
+from tqdm import tqdm
 
 
 MAX_COUNT_EACH_FETCH = 200
@@ -10,6 +11,7 @@ def get_review_ps(app_id, n_max=1000):
     continuation_token = None
     result = []
 
+    pbar = tqdm(total=n_max + MAX_COUNT_EACH_FETCH)
     while len(result) <= n_max:
         try:
             _result, continuation_token = reviews(
@@ -25,6 +27,7 @@ def get_review_ps(app_id, n_max=1000):
             continue
 
         result += _result
+        pbar.update(len(_result))
 
         if continuation_token.token is None:
             break
@@ -41,13 +44,13 @@ if __name__ == "__main__":
     continuation_token = None
     result = []
 
-    # app_id = "com.bca"
-    # app_id = "id.bmri.livin"
+    app_id = "com.bca"
+    app_id = "id.bmri.livin"
     app_id = "id.co.bri.brimo"
     version = "v3"
 
-    df = get_review_ps(app_id=app_id)
-    df.to_csv(f"{app_id}_{version}_playstore_review.csv", sep=";", index=False)
+    # df = get_review_ps(app_id=app_id)
+    # df.to_csv(f"{app_id}_{version}_playstore_review.csv", sep=";", index=False)
 
     # print information
     print(f"Downloaded : {len(result)} | Oldest Date : {min(df['at'])}")
