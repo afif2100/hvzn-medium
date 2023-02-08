@@ -1,28 +1,28 @@
 from matplotlib.pyplot import table
 import pandas as pd
 from sqlalchemy import create_engine
-from helper import get_review_ps
+from helper import get_review_by_last_date
 from helper import SentimentPredictor
 from helper.helper import insert_df_to_database, get_last_date_bq, get_last_date_db
 import os
 
 
-def get_review_and_insert(app_id, n=5000, engine=None, conn=None):
+def get_review_and_insert(app_id, engine=None, conn=None):
     # get data from playstore
 
     # get dataframe for each apps
     print(f"Get data from playstore : {app_id}")
 
     # filter dataframe only for newer apps
-    ld = get_last_date_db(app_id, conn)
+    last_date = get_last_date_db(app_id, conn)
 
     # get apps review
-    df = get_review_ps(app_id, n)
+    df = get_review_by_last_date(app_id, last_date)
 
     # filter df
-    df = df[df["at"] > ld]
+    df = df[df["at"] > last_date]
     df["apps"] = app_id
-    print(f"New data for : {app_id} | {len(df)} | {ld}")
+    print(f"New data for : {app_id} | {len(df)} | {last_date}")
 
     # insert df to revuiew database
     if len(df) > 0:
@@ -87,15 +87,18 @@ if __name__ == "__main__":
     preds = SentimentPredictor()
 
     # insert data
-    app_ids = ["id.co.bri.brimo", "com.bca", "id.bmri.livin"]
+    app_ids = ["id.co.bri.brimo", "com.bca", "id.bmri.livin", "net.myinfosys.PermataMobileX"]
     for app in app_ids:
+        # Get App review and insert to LocalDB
         get_review_and_insert(
-            app_id=app, n=5000, engine=preds.db_engine, conn=preds.db_conn
+            app_id=app,
+            engine=preds.db_engine,
+            conn=preds.db_conn
         )
 
-        # predict data
-        preds.batch_prediction(batch_size=1000)
+    # Predict non exist sentiment data
+    preds.batch_prediction(batch_size=5000)
 
-        # sync data to bigquery
-        last_date_app = get_last_date_bq(project_id, app)
-        ingest_to_bq(app, last_date_app, upload=True, engine=preds.db_engine)
+    # sync data to bigquery
+    # last_date_app = get_last_date_bq(project_id, app)
+    # ingest_to_bq(app, last_date_app, upload=True, engine=preds.db_engine)
