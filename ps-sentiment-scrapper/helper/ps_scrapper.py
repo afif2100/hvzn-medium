@@ -96,7 +96,7 @@ if __name__ == "__main__":
     app_id = "id.co.bri.brimo"
     version = "v3"
 
-    # df = get_review_ps(app_id=app_id)
+    df = get_review_ps(app_id=app_id)
     # df.to_csv(f"{app_id}_{version}_playstore_review.csv", sep=";", index=False)
 
     # print information

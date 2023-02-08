@@ -15,8 +15,8 @@ warnings.filterwarnings("ignore")
 class SentimentPredictor:
     def __init__(self):
         self._load_preprocess()
-        self._load_model()
         self._postgress_conn()
+        self.loaded = False
 
     def _postgress_conn(self):
         connection_info = {
@@ -62,6 +62,10 @@ class SentimentPredictor:
         )
         print("Load model success!")
         print("-" * 5 * 20)
+
+        # flag model is loadded
+        self.loaded = True
+
 
     def _load_preprocess(self):
         # Text preprocessing
@@ -120,8 +124,13 @@ class SentimentPredictor:
         print(
             f"Prediction Status : {db_length}/{db_target} | {round(db_length/db_target*100, 3)}%"
         )
-
+    
     def batch_prediction(self, batch_size=1000):
+
+        # do load model if not loaded
+        if self.loaded == False:
+            self._load_model()
+
         self._check_prediction_status()
         df = self._get_data_from_postgress(batch_size)
 
@@ -144,8 +153,7 @@ class SentimentPredictor:
                 print(df)
 
             self._check_prediction_status()
-
-
+    
 if __name__ == "__main__":
     preds = SentimentPredictor()
     preds.batch_prediction(batch_size=10)

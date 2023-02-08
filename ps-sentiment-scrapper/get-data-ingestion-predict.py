@@ -97,7 +97,7 @@ if __name__ == "__main__":
         )
 
     # Predict non exist sentiment data
-    preds.batch_prediction(batch_size=5000)
+    preds.batch_prediction(batch_size=1000)
 
     # sync data to bigquery
     # last_date_app = get_last_date_bq(project_id, app)
