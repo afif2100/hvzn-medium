@@ -10,6 +10,9 @@ app:
 batch:
 	python get-data-ingestion-predict.py
 
+sync-bq:
+	python experiment/full-data-sync-pg-bq.py
+
 build:
 	docker build -t $(IMAGE_NAME):$(TAG) .
 
@@ -17,7 +20,7 @@ push:
 	docker push $(IMAGE_NAME):$(TAG)
 
 run:
-	docker run -it --rm -p $(PORT):$(PORT) $(IMAGE_NAME):$(TAG)
+	docker run -it --rm -p $(PORT):$(PORT) --hostname host $(IMAGE_NAME):$(TAG) 
 
 bash:
 	docker run -it --rm $(IMAGE_NAME):$(TAG) bash
