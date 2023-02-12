@@ -15,7 +15,7 @@ def _print_info(df):
     print("-" * 5 * 20)
 
 
-def get_review_ps(app_id, n_max=1000):
+def get_review(app_id, n_max=1000):
     continuation_token = None
     result = []
 
@@ -86,19 +86,3 @@ def get_review_by_last_date(app_id, last_date) -> pd.DataFrame:
     df = pd.DataFrame(results)
     _print_info(df)
     return df
-
-
-if __name__ == "__main__":
-    continuation_token = None
-    result = []
-
-    app_id = "com.bca"
-    app_id = "id.bmri.livin"
-    app_id = "id.co.bri.brimo"
-    version = "v3"
-
-    df = get_review_ps(app_id=app_id)
-    # df.to_csv(f"{app_id}_{version}_playstore_review.csv", sep=";", index=False)
-
-    # print information
-    print(f"Downloaded : {len(result)} | Oldest Date : {min(df['at'])}")

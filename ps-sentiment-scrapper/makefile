@@ -11,7 +11,7 @@ home:
 	streamlit run home.py
 
 batch:
-	python get-data-ingestion-predict.py
+	python process_batch.py
 
 sync-bq:
 	python experiment/full-data-sync-pg-bq.py
