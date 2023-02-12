@@ -7,7 +7,7 @@ PORT=8001
 app:
 	uvicorn $(APP_FILE):app --host 0.0.0.0 --port $(PORT) --reload --workers 4
 
-st:
+home:
 	streamlit run home.py
 
 batch:
