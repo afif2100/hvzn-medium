@@ -1,7 +1,14 @@
 from fastapi import FastAPI
+import asyncio
 from transformers import pipeline
 from pydantic import BaseModel
 from simager.preprocess import TextPreprocess
+
+
+async def heartbeat():
+    while True:
+        print("Heartbeat:API Status OK")
+        await asyncio.sleep(5)
 
 
 class SentimentText(BaseModel):
@@ -60,3 +67,7 @@ model = PredictionModel()
 async def predict(text: SentimentText):
     label, score = model.predict(text)
     return {"label": label, "score": score}
+
+
+# Start the heartbeat task in the background
+asyncio.create_task(heartbeat())

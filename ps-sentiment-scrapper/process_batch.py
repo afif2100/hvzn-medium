@@ -1,10 +1,12 @@
-from matplotlib.pyplot import table
 import pandas as pd
 from sqlalchemy import create_engine
-from helper import get_review_by_last_date
 from helper import SentimentPredictor
-from helper.helper import insert_df_to_database, get_last_date_bq, get_last_date_db
-import os
+from helper import (
+    get_last_date_bq,
+    get_last_date_db,
+    get_review_by_last_date,
+    insert_reviews_to_database,
+)
 
 
 def get_review_and_insert(app_id, engine=None, conn=None):
@@ -12,6 +14,7 @@ def get_review_and_insert(app_id, engine=None, conn=None):
     last_update = get_last_date_db(app_id, conn)
 
     # Get reviews of the app from the playstore
+    print(f"Get data for {app_id}, last updated at: {last_update}")
     reviews = get_review_by_last_date(app_id, last_update)
 
     # Filter the dataframe to only include newer reviews
@@ -25,7 +28,7 @@ def get_review_and_insert(app_id, engine=None, conn=None):
     if new_reviews.empty:
         print(f"No new reviews to insert for {app_id}")
     else:
-        insert_df_to_database(new_reviews, "review", engine)
+        insert_reviews_to_database(new_reviews, "review", engine)
         print(
             f"Inserted {len(new_reviews)} new reviews for {app_id} into the database."
         )
@@ -94,6 +97,7 @@ if __name__ == "__main__":
         "net.myinfosys.PermataMobileX",
         "id.co.btn.mobilebanking.android",
         "com.jago.digitalBanking",
+        "id.co.cimbniaga.mobile.android",
     ]
     for app in app_ids:
         # Get App review and insert to LocalDB

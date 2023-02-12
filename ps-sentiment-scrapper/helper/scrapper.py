@@ -82,6 +82,6 @@ def get_review_by_last_date(app_id, last_date) -> pd.DataFrame:
 
         # Print status every 5000 results
         if len(results) % 5000 == 0:
-            print(f"\n Last scrap date : {results_date}")
+            print(f"\nLast scrap date : {results_date}")
 
     return transform_to_df(results)
