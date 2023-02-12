@@ -8,26 +8,27 @@ import os
 
 
 def get_review_and_insert(app_id, engine=None, conn=None):
-    # Get data from the playstore
-    print(f"Getting data from playstore for app: {app_id}")
-
     # Get last updated date from the database
-    last_date = get_last_date_db(app_id, conn)
+    last_update = get_last_date_db(app_id, conn)
 
-    # Get reviews of the app
-    df = get_review_by_last_date(app_id, last_date)
+    # Get reviews of the app from the playstore
+    reviews = get_review_by_last_date(app_id, last_update)
 
     # Filter the dataframe to only include newer reviews
-    df = df[df["at"] > last_date]
-    df["apps"] = app_id
-    print(f"New data for {app_id}: {len(df)} reviews, Last update: {last_date}")
+    new_reviews = reviews[reviews["at"] > last_update]
+    new_reviews["apps"] = app_id
+    print(
+        f"Found {len(new_reviews)} new reviews for {app_id}, last updated at: {last_update}"
+    )
 
     # Insert the filtered dataframe into the database
-    if len(df) > 0:
-        insert_df_to_database(df, db_table="review", engine=engine)
-        print(f"Inserted {len(df)} reviews for {app_id} into the database.")
+    if new_reviews.empty:
+        print(f"No new reviews to insert for {app_id}")
     else:
-        print(f"No new data to insert for {app_id}")
+        insert_df_to_database(new_reviews, "review", engine)
+        print(
+            f"Inserted {len(new_reviews)} new reviews for {app_id} into the database."
+        )
 
 
 def get_result_data(app, dttm, engine=None):
