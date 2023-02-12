@@ -1,7 +1,5 @@
-from fastapi import FastAPI, Request, Body
+from fastapi import FastAPI
 from transformers import pipeline
-import numpy as np
-import json
 from pydantic import BaseModel
 from simager.preprocess import TextPreprocess
 
@@ -13,51 +11,43 @@ class SentimentText(BaseModel):
 class PredictionModel:
     def __init__(self) -> None:
         self.loaded = False
-        self._load_preprocess()
+        self.model = None
+        self.text_cleaner = TextPreprocess(
+            methods=[
+                "rm_hastag",
+                "rm_mention",
+                "rm_nonascii",
+                "rm_emoticons",
+                "rm_html",
+                "rm_url",
+                "sparate_str_numb",
+                "pad_punct",
+                "rm_punct",
+                "rm_repeat_char",
+                "rm_repeat_word",
+                "rm_numb",
+                "rm_whitespace",
+                "normalize",
+            ]
+        )
 
-    def _load_preprocess(self):
-        # Text preprocessing
-        methods = [
-            "rm_hastag",
-            "rm_mention",
-            "rm_nonascii",
-            "rm_emoticons",
-            "rm_html",
-            "rm_url",
-            "sparate_str_numb",
-            "pad_punct",
-            "rm_punct",
-            "rm_repeat_char",
-            "rm_repeat_word",
-            "rm_numb",
-            "rm_whitespace",
-            "normalize",
-        ]
-        self.cleaner = TextPreprocess(methods=methods)
-
-    def _load_model(self):
-        # sentiment model
-        print("-" * 5 * 20)
-        pretrained_name = "models"
+    def load_model(self):
         self.model = pipeline(
-            "sentiment-analysis",
-            model=pretrained_name,
-            tokenizer=pretrained_name,
+            task="sentiment-analysis",
+            model="models",
+            tokenizer="models",
             use_auth_token=True,
         )
-        print("Load model success!")
-        print("-" * 5 * 20)
-
         self.loaded = True
 
     def predict(self, text: str):
         if not self.loaded:
-            self._load_model()
+            self.load_model()
 
         if text:
-            text = self.cleaner(text)
-            result = self.model(text)[0]
-            return result["label"], result["score"]
+            cleaned_text = self.text_cleaner(text)
+            prediction = self.model(cleaned_text)[0]
+            return prediction["label"], prediction["score"]
         else:
             return "neutral", 0
 

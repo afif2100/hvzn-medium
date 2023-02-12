@@ -26,7 +26,7 @@ push:
 	docker push $(IMAGE_NAME):$(TAG)
 
 run:
-	docker run -it --rm -p $(PORT):$(PORT) --hostname host $(IMAGE_NAME):$(TAG) 
+	docker run -it --rm -e PG_HOST=db-1 -p $(PORT):$(PORT) --hostname host $(IMAGE_NAME):$(TAG) 
 
 bash:
 	docker run -it --rm $(IMAGE_NAME):$(TAG) bash

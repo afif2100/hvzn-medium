@@ -8,6 +8,7 @@ MAX_COUNT_EACH_FETCH = 200
 
 
 def _print_info(df):
+    print("\n")
     print("-" * 5 * 20)
     print(f"Downloaded : {len(df)}")
     print(f"Oldest Date : {min(df['at'])}")
