@@ -5,11 +5,12 @@ import json
 from pydantic import BaseModel
 from simager.preprocess import TextPreprocess
 
+
 class SentimentText(BaseModel):
     text: str
 
-class PredictionModel():
 
+class PredictionModel:
     def __init__(self) -> None:
         self.loaded = False
         self._load_preprocess()
@@ -60,10 +61,12 @@ class PredictionModel():
         else:
             return "neutral", 0
 
+
 app = FastAPI()
 model = PredictionModel()
 
+
 @app.post("/predict")
-async def predict(text: SentimentText ):
-    label, score =  model.predict(text)
+async def predict(text: SentimentText):
+    label, score = model.predict(text)
     return {"label": label, "score": score}

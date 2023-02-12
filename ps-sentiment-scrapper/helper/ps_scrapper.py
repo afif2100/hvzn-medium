@@ -46,6 +46,7 @@ def get_review_ps(app_id, n_max=1000):
 
     return df
 
+
 def get_review_by_last_date(app_id, last_date) -> pd.DataFrame:
     results = []
     continuation_token = None
@@ -62,9 +63,9 @@ def get_review_by_last_date(app_id, last_date) -> pd.DataFrame:
                 country="id",  # defaults to 'us'
                 sort=Sort.NEWEST,  # defaults to Sort.MOST_RELEVANT
                 filter_score_with=None,  # defaults to None(means all score)
-                )
+            )
             results += result
-            results_date = results[-1]['at']
+            results_date = results[-1]["at"]
             pbar.update(len(results))
         except:
             continue
@@ -72,13 +73,13 @@ def get_review_by_last_date(app_id, last_date) -> pd.DataFrame:
         # if there is no more data then break loop
         if continuation_token.token is None:
             break
-        
+
         # Print status
         if len(results) % 5000 == 0:
             print(f"\n Last scrap date : {results_date}")
 
         # If date match then break the loop
-        if results[-1]['at'] <= last_date:
+        if results[-1]["at"] <= last_date:
             is_date_match = True
 
     # transform to df

@@ -87,14 +87,17 @@ if __name__ == "__main__":
     preds = SentimentPredictor()
 
     # insert data
-    app_ids = ["id.co.bri.brimo", "com.bca", "id.bmri.livin", "net.myinfosys.PermataMobileX", "id.co.btn.mobilebanking.android", "com.jago.digitalBanking"]
+    app_ids = [
+        "id.co.bri.brimo",
+        "com.bca",
+        "id.bmri.livin",
+        "net.myinfosys.PermataMobileX",
+        "id.co.btn.mobilebanking.android",
+        "com.jago.digitalBanking",
+    ]
     for app in app_ids:
         # Get App review and insert to LocalDB
-        get_review_and_insert(
-            app_id=app,
-            engine=preds.db_engine,
-            conn=preds.db_conn
-        )
+        get_review_and_insert(app_id=app, engine=preds.db_engine, conn=preds.db_conn)
 
     # Predict non exist sentiment data
     preds.batch_prediction(batch_size=1000)

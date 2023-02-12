@@ -66,7 +66,6 @@ class SentimentPredictor:
         # flag model is loadded
         self.loaded = True
 
-
     def _load_preprocess(self):
         # Text preprocessing
         methods = [
@@ -124,7 +123,7 @@ class SentimentPredictor:
         print(
             f"Prediction Status : {db_length}/{db_target} | {round(db_length/db_target*100, 3)}%"
         )
-    
+
     def batch_prediction(self, batch_size=1000):
 
         # do load model if not loaded
@@ -153,7 +152,8 @@ class SentimentPredictor:
                 print(df)
 
             self._check_prediction_status()
-    
+
+
 if __name__ == "__main__":
     preds = SentimentPredictor()
     preds.batch_prediction(batch_size=10)

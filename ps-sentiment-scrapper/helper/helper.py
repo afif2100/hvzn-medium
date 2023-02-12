@@ -52,7 +52,7 @@ def get_last_date_db(app_id, conn=None):
     # execute query
     curr.execute(date_query)
     t = curr.fetchall()[0][0]
-    if not isinstance(t, datetime.date) and t :
+    if not isinstance(t, datetime.date) and t:
         t = dateutil.parser.parse(t)
     if not t:
         # if null set default date
