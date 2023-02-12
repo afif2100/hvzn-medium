@@ -16,6 +16,9 @@ batch:
 sync-bq:
 	python experiment/full-data-sync-pg-bq.py
 
+download-model:
+	git clone https://huggingface.co/sahri/indonesiasentiment models
+
 build:
 	docker build -t $(IMAGE_NAME):$(TAG) .
 
