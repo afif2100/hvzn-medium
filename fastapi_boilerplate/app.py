@@ -1,36 +1,38 @@
 from fastapi import FastAPI, Request, Body
 import joblib
 import numpy as np
-import json
+from pydantic import BaseModel
+
+
+class User(BaseModel):
+    age: int
+    bmi: float
+
+
+class PredictionModel:
+    def __init__(self) -> None:
+        self.model = joblib.load("model.pkl")
+
+    def predict(self, age, bmi):
+        result = self.model.predict([[age, bmi]])
+
+        if result[0] == 1:
+            result = "Diabetes"
+        else:
+            result = "Not Diabetes"
+
+        return result
+
 
 app = FastAPI()
+predict_function = PredictionModel()
 
-
-@app.get("/")
-async def read_main():
-    return {"message":"Hello World"}
 
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
 
+
 @app.post("/predict")
-async def predict(payload: dict = Body(...)):
-
-    # Get body content
-    data = payload['data']
-    data = np.array([data])
-
-    # Load the model
-    model = joblib.load('model.pkl')
-
-    # Make the prediction
-    prediction = model.predict(data)
-
-    if prediction[0] == 1:
-        result = 'Diabetes'
-    else:
-        result = 'Not Diabetes'
-
-    # Return the prediction
-    return {"prediction": result}
+async def predict(user: User):
+    return predict_function.predict(user.age, user.bmi)
