@@ -7,16 +7,16 @@ import datetime
 import dateutil
 
 
-def insert_df_to_database(df, db_table=None, engine=None):
+def insert_reviews_to_database(df, db_table=None, engine=None):
     # Ingest data 1 by 1 prevent error on duplication
     print("-" * 5 * 20)
-    print(f"insert_df_to_database : {db_table}")
+    print(f"Inserted {len(df)} reviews to the database table '{db_table}'")
     for i in trange(len(df)):
         try:
             df.iloc[i : i + 1].to_sql(
                 name=db_table, if_exists="append", con=engine, index=False
             )
-        except:
+        except sqlalchemy.exc.IntegrityError as e:
             pass
 
     return True
@@ -29,10 +29,6 @@ def get_last_date_bq(project_id, app_id=None):
     """
     if app_id:
         query += f"WHERE apps = '{app_id}'"
-
-    # print("-" * 5 * 20)
-    # print(query)
-    # print("-" * 5 * 20)
 
     last_dt = pd.read_gbq(query, project_id=project_id)
     return last_dt["lst"][0]

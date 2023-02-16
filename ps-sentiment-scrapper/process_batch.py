@@ -1,34 +1,37 @@
-from matplotlib.pyplot import table
 import pandas as pd
 from sqlalchemy import create_engine
-from helper import get_review_by_last_date
 from helper import SentimentPredictor
-from helper.helper import insert_df_to_database, get_last_date_bq, get_last_date_db
-import os
+from helper import (
+    get_last_date_bq,
+    get_last_date_db,
+    get_review_by_last_date,
+    insert_reviews_to_database,
+)
 
 
 def get_review_and_insert(app_id, engine=None, conn=None):
-    # get data from playstore
+    # Get last updated date from the database
+    last_update = get_last_date_db(app_id, conn)
 
-    # get dataframe for each apps
-    print(f"Get data from playstore : {app_id}")
+    # Get reviews of the app from the playstore
+    print(f"Get data for {app_id}, last updated at: {last_update}")
+    reviews = get_review_by_last_date(app_id, last_update)
 
-    # filter dataframe only for newer apps
-    last_date = get_last_date_db(app_id, conn)
+    # Filter the dataframe to only include newer reviews
+    new_reviews = reviews[reviews["at"] > last_update]
+    new_reviews["apps"] = app_id
+    print(
+        f"Found {len(new_reviews)} new reviews for {app_id}, last updated at: {last_update}"
+    )
 
-    # get apps review
-    df = get_review_by_last_date(app_id, last_date)
-
-    # filter df
-    df = df[df["at"] > last_date]
-    df["apps"] = app_id
-    print(f"New data for : {app_id} | {len(df)} | {last_date}")
-
-    # insert df to revuiew database
-    if len(df) > 0:
-        insert_df_to_database(df, db_table="review", engine=engine)
+    # Insert the filtered dataframe into the database
+    if new_reviews.empty:
+        print(f"No new reviews to insert for {app_id}")
     else:
-        print(f"No new data for {app_id}")
+        insert_reviews_to_database(new_reviews, "review", engine)
+        print(
+            f"Inserted {len(new_reviews)} new reviews for {app_id} into the database."
+        )
 
 
 def get_result_data(app, dttm, engine=None):
@@ -82,11 +85,11 @@ def ingest_to_bq(app, last_date_app, upload=True, engine=None):
 
 
 if __name__ == "__main__":
-    # get last updated date
+
     project_id = "hvzn-development"
     preds = SentimentPredictor()
 
-    # insert data
+    # Get review data and insert data
     app_ids = [
         "id.co.bri.brimo",
         "com.bca",
@@ -94,6 +97,7 @@ if __name__ == "__main__":
         "net.myinfosys.PermataMobileX",
         "id.co.btn.mobilebanking.android",
         "com.jago.digitalBanking",
+        "id.co.cimbniaga.mobile.android",
     ]
     for app in app_ids:
         # Get App review and insert to LocalDB
@@ -102,6 +106,6 @@ if __name__ == "__main__":
     # Predict non exist sentiment data
     preds.batch_prediction(batch_size=1000)
 
-    # sync data to bigquery
+    # Sync data to bigquery
     # last_date_app = get_last_date_bq(project_id, app)
     # ingest_to_bq(app, last_date_app, upload=True, engine=preds.db_engine)

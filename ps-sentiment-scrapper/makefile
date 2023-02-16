@@ -7,7 +7,7 @@ PORT=8001
 app:
 	uvicorn $(APP_FILE):app --host 0.0.0.0 --port $(PORT) --reload --workers 4
 
-st:
+home:
 	streamlit run home.py
 
 batch:
@@ -16,7 +16,7 @@ batch:
 sync-bq:
 	python experiment/full-data-sync-pg-bq.py
 
-download_model:
+download-model:
 	git clone https://huggingface.co/sahri/indonesiasentiment models
 
 build:
@@ -26,7 +26,7 @@ push:
 	docker push $(IMAGE_NAME):$(TAG)
 
 run:
-	docker run -it --rm -p $(PORT):$(PORT) --hostname host $(IMAGE_NAME):$(TAG) 
+	docker run -it --rm -e PG_HOST=db-1 -p $(PORT):$(PORT) --hostname host $(IMAGE_NAME):$(TAG) 
 
 bash:
 	docker run -it --rm $(IMAGE_NAME):$(TAG) bash

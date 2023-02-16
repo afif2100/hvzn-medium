@@ -8,21 +8,30 @@ MAX_COUNT_EACH_FETCH = 200
 
 
 def _print_info(df):
+    print("\n")
     print("-" * 5 * 20)
-    print(
-        f"Downloaded : {len(df)} | Oldest Date : {min(df['at'])} | Latest Date : {max(df['at'])}"
-    )
+    print(f"Downloaded : {len(df)}")
+    print(f"Oldest Date : {min(df['at'])}")
+    print(f"Latest Date : {max(df['at'])}")
     print("-" * 5 * 20)
 
 
-def get_review_ps(app_id, n_max=1000):
+def transform_to_df(dict_list: list):
+
+    # Transform the results to a pandas dataframe
+    df = pd.DataFrame(dict_list)
+    _print_info(df)
+    return df
+
+
+def get_review(app_id, n_max=1000):
     continuation_token = None
-    result = []
+    results = []
 
     pbar = tqdm(total=n_max + MAX_COUNT_EACH_FETCH)
-    while len(result) <= n_max:
+    while len(results) <= n_max:
         try:
-            _result, continuation_token = reviews(
+            result, continuation_token = reviews(
                 app_id,
                 count=MAX_COUNT_EACH_FETCH,
                 continuation_token=continuation_token,
@@ -34,17 +43,13 @@ def get_review_ps(app_id, n_max=1000):
         except:
             continue
 
-        result += _result
-        pbar.update(len(_result))
+        results += result
+        pbar.update(len(result))
 
         if continuation_token.token is None:
             break
 
-    # transform to df
-    df = pd.DataFrame(result)
-    _print_info(df)
-
-    return df
+    return transform_to_df(results)
 
 
 def get_review_by_last_date(app_id, last_date) -> pd.DataFrame:
@@ -70,35 +75,13 @@ def get_review_by_last_date(app_id, last_date) -> pd.DataFrame:
         except:
             continue
 
-        # if there is no more data then break loop
-        if continuation_token.token is None:
+        # If there is no more data or date match, then break the loop
+        if (continuation_token.token is None) or (results[-1]["at"] <= last_date):
+            is_date_match = True
             break
 
-        # Print status
+        # Print status every 5000 results
         if len(results) % 5000 == 0:
-            print(f"\n Last scrap date : {results_date}")
+            print(f"\nLast scrap date : {results_date}")
 
-        # If date match then break the loop
-        if results[-1]["at"] <= last_date:
-            is_date_match = True
-
-    # transform to df
-    df = pd.DataFrame(results)
-    _print_info(df)
-    return df
-
-
-if __name__ == "__main__":
-    continuation_token = None
-    result = []
-
-    app_id = "com.bca"
-    app_id = "id.bmri.livin"
-    app_id = "id.co.bri.brimo"
-    version = "v3"
-
-    df = get_review_ps(app_id=app_id)
-    # df.to_csv(f"{app_id}_{version}_playstore_review.csv", sep=";", index=False)
-
-    # print information
-    print(f"Downloaded : {len(result)} | Oldest Date : {min(df['at'])}")
+    return transform_to_df(results)

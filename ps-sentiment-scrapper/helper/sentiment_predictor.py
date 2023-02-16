@@ -4,8 +4,8 @@ import psycopg2
 from sqlalchemy import create_engine
 import pandas as pd
 import logging
-from helper.helper import insert_df_to_database
 import os
+from helper.helper import insert_reviews_to_database
 import warnings
 
 logging.getLogger().addHandler(logging.StreamHandler())
@@ -126,23 +126,21 @@ class SentimentPredictor:
 
     def batch_prediction(self, batch_size=1000):
 
-        # do load model if not loaded
-        if self.loaded == False:
+        if not self.loaded:
             self._load_model()
 
         self._check_prediction_status()
         df = self._get_data_from_postgress(batch_size)
 
-        # while there is a data it will predict
         while len(df) > 0:
             try:
-                # get data ad do preprocess
-                df["clean_text"] = df["content"].apply(lambda x: self.cleaner(x))
+                df["clean_text"] = df["content"].apply(self.cleaner)
                 df["sentiment"], df["pscore"] = zip(
-                    *df["clean_text"].apply(lambda x: self._predict_text(x))
+                    *df["clean_text"].apply(self._predict_text)
                 )
-                # sent to postgress
-                insert_df_to_database(df, db_table="sentiment", engine=self.db_engine)
+                insert_reviews_to_database(
+                    df, db_table="sentiment", engine=self.db_engine
+                )
 
                 # get new data
                 df = self._get_data_from_postgress(batch_size)
