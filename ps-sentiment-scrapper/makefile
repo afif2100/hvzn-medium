@@ -11,10 +11,13 @@ st:
 	streamlit run home.py
 
 batch:
-	python get-data-ingestion-predict.py
+	python process_batch.py
 
 sync-bq:
 	python experiment/full-data-sync-pg-bq.py
+
+download_model:
+	git clone https://huggingface.co/sahri/indonesiasentiment models
 
 build:
 	docker build -t $(IMAGE_NAME):$(TAG) .

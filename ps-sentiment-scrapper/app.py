@@ -65,7 +65,6 @@ class PredictionModel:
 app = FastAPI()
 model = PredictionModel()
 
-
 @app.post("/predict")
 async def predict(text: SentimentText):
     label, score = model.predict(text)
