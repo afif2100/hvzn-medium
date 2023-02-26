@@ -2,19 +2,22 @@ APP_FILE=app
 # IMAGE_NAME=gcr.io/hvzn-development/fastapi-app/app
 IMAGE_NAME=afif2100/sentiment-playstore-banking
 TAG=latest
+HOST=0.0.0.0
 PORT=8001
 
 app:
-	uvicorn $(APP_FILE):app --host 0.0.0.0 --port $(PORT) --reload --workers 4
+	uvicorn $(APP_FILE):app --host ${HOST} --port $(PORT) --reload --workers 4
 
 home:
 	streamlit run home.py
+	pyclean .
 
 batch:
 	python process_batch.py
+	pyclean .
 
 sync-bq:
-	python experiment/full-data-sync-pg-bq.py
+	python experiment/sync_with_bq.py
 
 download-model:
 	git clone https://huggingface.co/sahri/indonesiasentiment models
