@@ -5,7 +5,7 @@ TAG=latest
 PORT=8000
 MWD = /Users/hafizhan.aliady/Documents/GitHub/hvzn-medium
 PROM_CONFIG=/Users/hafizhan.aliady/Documents/GitHub/hvzn-medium/api-monitoring/config
-GRAFANA_CONFIG=/Users/hafizhan.aliady/Documents/GitHub/hvzn-medium/api-monitoring/config
+GRAFANA_CONFIG=/Users/hafizhan.aliady/Documents/GitHub/hvzn-medium/api-monitoring/config/grafana
 
 app:
 	gunicorn main:app --reload -b 0.0.0.0:8000
@@ -31,7 +31,7 @@ prom:
 	-v ${PROM_CONFIG}:/etc/prometheus \
 	prom/prometheus
 
-grafana:
+gf:
 	docker run --rm -it \
 	-p 3000:3000 \
 	-v ${GRAFANA_CONFIG}:/var/lib/grafana \

@@ -2,3 +2,4 @@ flask
 prometheus-flask-exporter
 gunicorn
 numpy
+loguru

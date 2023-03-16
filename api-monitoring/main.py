@@ -1,6 +1,8 @@
 from flask import Flask, jsonify
 from prometheus_flask_exporter import PrometheusMetrics
 import numpy as np
+from time import sleep
+from loguru import logger
 
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
@@ -17,5 +19,8 @@ def health():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    result_ = np.random.randint(1, 100)
-    return {"result": result_}
+    rand_nums = np.random.uniform(low=0.001, high=0.2, size=(1,))[0]
+    rand_nums = round(rand_nums,4)
+    logger.info(f"Sleep for {rand_nums}s")
+    sleep(rand_nums)
+    return {"result": str(rand_nums)}
