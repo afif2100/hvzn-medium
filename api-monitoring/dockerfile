@@ -1,0 +1,8 @@
+FROM python:3.8.16-slim-buster
+
+USER $USER
+COPY . $WORKDIR
+
+RUN pip install -r requirements.txt
+
+ENTRYPOINT ["gunicorn","main:app" ,"--reload","-b" ,"0.0.0.0:8000"]
