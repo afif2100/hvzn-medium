@@ -6,7 +6,7 @@ global:
 # - url: https://prometheus-us-central1.grafana.net/api/prom/push
 #   basic_auth:
 #     username: 827289
-#     password: eyJrIjoiMjNkNzc0MGNlNzhjM2U3MTAyOTE1MzY1MmNlYzYwNDE2NDcxYjk3NCIsIm4iOiJwcm9tLXB1Ymxpc2hlciIsImlkIjo4MTYyNzF9
+#     password: 
 alerting:
   alertmanagers:
   - follow_redirects: true
