@@ -1,0 +1,3 @@
+flask
+prometheus-flask-exporter
+gunicorn
