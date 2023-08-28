@@ -10,6 +10,7 @@ from simager.preprocess import TextPreprocess
 from helper.helper import insert_reviews_to_database
 
 logging.getLogger().addHandler(logging.StreamHandler())
+logger = logging.getLogger(__name__)
 warnings.filterwarnings("ignore")
 
 
@@ -88,6 +89,13 @@ class SentimentPredictor:
             return r_["label"], r_["score"]
         else:
             return "neutral", 0
+        
+    # create _preedict_text_v2 return list of dict
+    def _predict_text_v2(self, text: list) -> list[dict]:
+        try:
+            return self.model(text)
+        except Exception as e:
+            logger.error(e)
 
     def _get_data_from_postgres(self, n=1000):
         query = f"""
@@ -107,9 +115,10 @@ class SentimentPredictor:
         db_length = curr.fetchall()[0][0]
         curr.execute("SELECT Count('reviewId') as review_count from review")
         db_target = curr.fetchall()[0][0]
-        print(
-            f"Prediction Status: {db_length}/{db_target} | {round(db_length / db_target * 100, 3)}%"
-        )
+
+        # Print prediction status logger
+        _pred_status_info = f"Prediction Status: {db_length}/{db_target} | {round(db_length / db_target * 100, 3)}%"
+        logger.info(_pred_status_info)
 
     def batch_prediction(self, batch_size=1000):
         self._check_prediction_status()
@@ -117,6 +126,11 @@ class SentimentPredictor:
         while not df.empty:
             try:
                 df["clean_text"] = df["content"].apply(self.cleaner)
+                # count none in clean_text
+                null_df = df[df["clean_text"].notna()]
+                logger.info(f"Found {len(null_df)} null values in clean_text")
+
+                # do prediction return tuple
                 predictions = df["clean_text"].apply(self._predict_text)
 
                 df[["sentiment", "pscore"]] = pd.DataFrame(
