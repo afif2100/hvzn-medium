@@ -71,17 +71,14 @@ def ingest_to_bq(app, last_date_app, upload=True, engine=None):
     destination_table = "hvzn_dev.review_sentiment"
     if len(df) == 0:
         return True
-    if upload:
-        df.to_gbq(
-            project_id=project_id,
-            destination_table=destination_table,
-            if_exists="append",
-        )
-        print(f"BQ Last date Before : {last_date_app}")
-        print(f"BQ Last date After : {get_last_date_bq(project_id)}")
-    else:
-        print("Not uploading to bq, cz this is testing")
-    return True
+    df.to_gbq(
+        project_id=project_id,
+        destination_table=destination_table,
+        if_exists="append",
+    )
+    print(f"BQ Last date Before : {last_date_app}")
+    print(f"BQ Last date After : {get_last_date_bq(project_id)}")
+    print("Not uploading to bq, cz this is testing")
 
 
 if __name__ == "__main__":
@@ -89,7 +86,6 @@ if __name__ == "__main__":
     project_id = "hvzn-development"
     preds = SentimentPredictor()
 
-    # Get review data and insert data
     app_ids = [
         "id.co.bri.brimo",
         "com.bca",
@@ -98,14 +94,25 @@ if __name__ == "__main__":
         "id.co.btn.mobilebanking.android",
         "com.jago.digitalBanking",
         "id.co.cimbniaga.mobile.android",
+        "src.com.bni",
     ]
-    for app in app_ids:
-        # Get App review and insert to LocalDB
-        get_review_and_insert(app_id=app, engine=preds.db_engine, conn=preds.db_conn)
 
-    # Predict non exist sentiment data
-    preds.batch_prediction(batch_size=1000)
+    # Get review data and insert data
+    # for app in app_ids:
+    #    get_review_and_insert(app_id=app, engine=preds.db_engine, conn=preds.db_conn)
 
-    # Sync data to bigquery
-    # last_date_app = get_last_date_bq(project_id, app)
-    # ingest_to_bq(app, last_date_app, upload=True, engine=preds.db_engine)
+    # Predict non-existing sentiment data
+    run_prediction = input("Run the Sentiment Prediction? [y]es/[n]o : ")
+    if run_prediction in ["y", "yes"]:
+        preds.batch_prediction(batch_size=500)
+    else:
+        print("Skipping the Prediction")
+
+    # Sync data to BigQuery
+    export_data_tobq = input("Export data to BQ? [y]es/[n]o : ")
+    if export_data_tobq in ["y", "yes"]:
+        for app in app_ids:
+            last_date_app = get_last_date_bq(project_id, app)
+            ingest_to_bq(app, last_date_app, upload=True, engine=preds.db_engine)
+    else:
+        exit(1)

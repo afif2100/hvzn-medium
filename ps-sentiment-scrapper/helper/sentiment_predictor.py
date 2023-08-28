@@ -1,12 +1,13 @@
-from simager.preprocess import TextPreprocess
-from transformers import pipeline
-import psycopg2
-from sqlalchemy import create_engine
-import pandas as pd
 import logging
 import os
-from helper.helper import insert_reviews_to_database
 import warnings
+import torch
+import psycopg2
+import pandas as pd
+from sqlalchemy import create_engine
+from transformers import pipeline
+from simager.preprocess import TextPreprocess
+from helper.helper import insert_reviews_to_database
 
 logging.getLogger().addHandler(logging.StreamHandler())
 warnings.filterwarnings("ignore")
@@ -15,10 +16,11 @@ warnings.filterwarnings("ignore")
 class SentimentPredictor:
     def __init__(self):
         self._load_preprocess()
-        self._postgress_conn()
-        self.loaded = False
+        self._postgres_conn()
+        self._load_model()
+        self.loaded = True
 
-    def _postgress_conn(self):
+    def _postgres_conn(self):
         connection_info = {
             "host": os.environ.get("PG_HOST", "localhost"),
             "port": os.environ.get("PG_PORT", 5432),
@@ -26,17 +28,12 @@ class SentimentPredictor:
             "user": os.environ.get("PG_USER", "postgres"),
             "password": os.environ.get("PG_PASS", "postgres"),
         }
-        # Sql engine
         self.db_engine = create_engine(
-            "postgresql+psycopg2://{}:{}@{}:{}/{}".format(
-                connection_info["user"],
-                connection_info["password"],
-                connection_info["host"],
-                connection_info["port"],
-                connection_info["db"],
+            "postgresql+psycopg2://{user}:{password}@{host}:{port}/{db}".format(
+                **connection_info
             )
         )
-        # psql engine
+
         self.db_conn = psycopg2.connect(
             host=connection_info["host"],
             port=connection_info["port"],
@@ -44,30 +41,29 @@ class SentimentPredictor:
             user=connection_info["user"],
             password=connection_info["password"],
         )
+        print("-" * 5 * 20)
+        self.db_conn.cursor()
+        print("PostgreSQL connection successful!")
+        print("-" * 5 * 20)
 
-        print("-" * 5 * 20)
-        self.db_engine.connect()
-        print("Postgress connection success!")
-        print("-" * 5 * 20)
+    def _gpu(self):
+        return 0 if torch.cuda.is_available() else -1
 
     def _load_model(self):
-        # sentiment model
-        print("-" * 5 * 20)
         pretrained_name = "models"
+        _device = self._gpu()
         self.model = pipeline(
             "sentiment-analysis",
             model=pretrained_name,
             tokenizer=pretrained_name,
             use_auth_token=True,
+            device=_device,
         )
-        print("Load model success!")
+        print("-" * 5 * 20)
+        print("Model loaded successfully!")
         print("-" * 5 * 20)
 
-        # flag model is loadded
-        self.loaded = True
-
     def _load_preprocess(self):
-        # Text preprocessing
         methods = [
             "rm_hastag",
             "rm_mention",
@@ -93,62 +89,46 @@ class SentimentPredictor:
         else:
             return "neutral", 0
 
-    def _get_data_from_postgress(self, n=1000):
-
-        # Get unpredicted data from postgres
+    def _get_data_from_postgres(self, n=1000):
         query = f"""
         SELECT "review"."reviewId"
         , "review"."content"
         FROM review
         LEFT JOIN sentiment
         ON ("review"."reviewId"="sentiment"."reviewId")
-        WHERE "sentiment"."sentiment" is null
+        WHERE "sentiment"."sentiment" IS NULL
         LIMIT {n};
         """
         return pd.read_sql(query, self.db_engine)
 
     def _check_prediction_status(self):
-        # create db cursor
         curr = self.db_conn.cursor()
-
-        # print status
         curr.execute("SELECT Count('reviewId') as review_count from sentiment")
         db_length = curr.fetchall()[0][0]
-
-        # get db target
         curr.execute("SELECT Count('reviewId') as review_count from review")
         db_target = curr.fetchall()[0][0]
-
-        # send status
         print(
-            f"Prediction Status : {db_length}/{db_target} | {round(db_length/db_target*100, 3)}%"
+            f"Prediction Status: {db_length}/{db_target} | {round(db_length / db_target * 100, 3)}%"
         )
 
     def batch_prediction(self, batch_size=1000):
-
-        if not self.loaded:
-            self._load_model()
-
         self._check_prediction_status()
-        df = self._get_data_from_postgress(batch_size)
-
-        while len(df) > 0:
+        df = self._get_data_from_postgres(batch_size)
+        while not df.empty:
             try:
                 df["clean_text"] = df["content"].apply(self.cleaner)
-                df["sentiment"], df["pscore"] = zip(
-                    *df["clean_text"].apply(self._predict_text)
+                predictions = df["clean_text"].apply(self._predict_text)
+
+                df[["sentiment", "pscore"]] = pd.DataFrame(
+                    predictions.tolist(), index=df.index
                 )
                 insert_reviews_to_database(
                     df, db_table="sentiment", engine=self.db_engine
                 )
-
-                # get new data
-                df = self._get_data_from_postgress(batch_size)
-
+                df = self._get_data_from_postgres(batch_size)
             except Exception as e:
                 print(e)
                 print(df)
-
             self._check_prediction_status()
 
 

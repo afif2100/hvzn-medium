@@ -4,21 +4,24 @@ import pandas as pd
 import sqlalchemy
 import psycopg2
 import datetime
+from sqlalchemy import exc
 import dateutil
 
 
 def insert_reviews_to_database(df, db_table=None, engine=None):
-    # Ingest data 1 by 1 prevent error on duplication
     print("-" * 5 * 20)
-    print(f"Inserted {len(df)} reviews to the database table '{db_table}'")
-    for i in trange(len(df)):
-        try:
-            df.iloc[i : i + 1].to_sql(
-                name=db_table, if_exists="append", con=engine, index=False
-            )
-        except sqlalchemy.exc.IntegrityError as e:
-            pass
+    print(f"Inserting {len(df)} reviews into the database table '{db_table}'")
 
+    try:
+        # Use bulk insert and transaction
+        df.to_sql(
+            name=db_table, if_exists="append", con=engine, index=False, method="multi"
+        )
+
+    except exc.IntegrityError as e:
+        pass
+
+    print("Insertion completed.")
     return True
 
 

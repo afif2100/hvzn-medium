@@ -5,6 +5,8 @@ TAG=latest
 HOST=0.0.0.0
 PORT=8001
 
+#export PG_HOST = 192.168.0.253
+
 app:
 	uvicorn $(APP_FILE):app --host ${HOST} --port $(PORT) --reload --workers 4
 
