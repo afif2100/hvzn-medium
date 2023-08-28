@@ -84,6 +84,7 @@ def ingest_to_bq(app, last_date_app, upload=True, engine=None):
 if __name__ == "__main__":
 
     import logging
+
     # set log to level info
     logging.basicConfig(level=logging.INFO)
 
@@ -108,7 +109,7 @@ if __name__ == "__main__":
     # Predict non-existing sentiment data
     run_prediction = input("Run the Sentiment Prediction? [y]es/[n]o : ")
     if run_prediction in ["y", "yes"]:
-        preds.batch_prediction(batch_size=500)
+        preds.batch_prediction(batch_size=1000)
     else:
         print("Skipping the Prediction")
 
