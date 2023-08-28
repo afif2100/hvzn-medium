@@ -108,8 +108,12 @@ if __name__ == "__main__":
     ]
 
     # Get review data and insert data
-    # for app in app_ids:
-    #    get_review_and_insert(app_id=app, engine=preds.db_engine, conn=preds.db_conn)
+    pull_data = input("Pull data from Playstore? [y]es/[n]o : ")
+    if pull_data in ["y", "yes"]:
+        for app in app_ids:
+            get_review_and_insert(app_id=app, engine=preds.db_engine, conn=preds.db_conn)
+    else:
+        print("Skipping the Pulling Data")
 
     # Predict non-existing sentiment data
     run_prediction = input("Run the Sentiment Prediction? [y]es/[n]o : ")
