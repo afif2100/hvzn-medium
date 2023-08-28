@@ -83,6 +83,12 @@ class SentimentPredictor:
         ]
         self.cleaner = TextPreprocess(methods=methods)
 
+    def _text_filler(self, text: str):
+        if not text:
+            return " "
+        else:
+            return text
+
     def _predict_text(self, text: str):
         if text:
             r_ = self.model(text)[0]
@@ -127,12 +133,14 @@ class SentimentPredictor:
         while not df.empty:
             try:
                 df["clean_text"] = df["content"].apply(self.cleaner)
-                # count none in clean_text
-                null_df = df[df["clean_text"].notna()]
-                logger.info(f"Found {len(null_df)} good values in clean_text")
+                df["clean_text"] = df["clean_text"].apply(self._text_filler)
 
                 # do prediction return tuple
-                predictions = df["clean_text"].apply(self._predict_text)
+                try:
+                    predictions = self._predict_text_v2(df["clean_text"].tolist())
+                except Exception as e:
+                    print("predict_text_v2 error")
+                    predictions = df["clean_text"].apply(self._predict_text)
 
                 df[["sentiment", "pscore"]] = pd.DataFrame(
                     predictions.tolist(), index=df.index
