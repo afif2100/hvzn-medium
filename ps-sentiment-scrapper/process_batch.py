@@ -83,6 +83,9 @@ def ingest_to_bq(app, last_date_app, upload=True, engine=None):
 
 if __name__ == "__main__":
 
+    import logging
+    logging.basicConfig("INFO")
+
     project_id = "hvzn-development"
     preds = SentimentPredictor()
 
