@@ -80,6 +80,7 @@ def ingest_to_bq(app, last_date_app, upload=True, engine=None):
         project_id=project_id,
         destination_table=destination_table,
         if_exists="append",
+        progress_bar=False,
     )
     print(f"BQ Last date Before : {last_date_app}")
     print(f"BQ Last date After : {get_last_date_bq(project_id)}")
@@ -121,7 +122,10 @@ if __name__ == "__main__":
     export_data_tobq = input("Export data to BQ? [y]es/[n]o : ")
     if export_data_tobq in ["y", "yes"]:
         for app in app_ids:
+            print("-----"*10)
+            print(f"Syncing data for {app}")
             last_date_app = get_last_date_bq(project_id, app)
             ingest_to_bq(app, last_date_app, upload=True, engine=preds.db_engine)
+            print("-----"*10)
     else:
         exit(1)
