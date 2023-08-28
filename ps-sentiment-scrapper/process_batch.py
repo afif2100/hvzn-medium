@@ -83,7 +83,6 @@ def ingest_to_bq(app, last_date_app, upload=True, engine=None):
     )
     print(f"BQ Last date Before : {last_date_app}")
     print(f"BQ Last date After : {get_last_date_bq(project_id)}")
-    print("Not uploading to bq, cz this is testing")
 
 
 if __name__ == "__main__":

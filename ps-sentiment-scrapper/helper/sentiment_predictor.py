@@ -125,7 +125,7 @@ class SentimentPredictor:
 
         # Print prediction status logger
         _pred_status_info = f"Prediction Status: {db_length}/{db_target} | {round(db_length / db_target * 100, 3)}%"
-        logger.info(_pred_status_info)
+        print(_pred_status_info)
 
     def batch_prediction(self, batch_size=1000):
         self._check_prediction_status()
