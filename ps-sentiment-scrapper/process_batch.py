@@ -99,6 +99,7 @@ if __name__ == "__main__":
     app_ids = [
         "id.co.bri.brimo",
         "com.bca",
+        "com.bca.mybca.omni.android",
         "id.bmri.livin",
         "net.myinfosys.PermataMobileX",
         "id.co.btn.mobilebanking.android",
