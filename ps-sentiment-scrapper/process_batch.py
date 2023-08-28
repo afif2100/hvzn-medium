@@ -63,6 +63,11 @@ def get_result_data(app, dttm, engine=None):
 
 
 def ingest_to_bq(app, last_date_app, upload=True, engine=None):
+
+    # if last_date_app is NaT, then return 2020-01-01 00:00:00
+    if pd.isnull(last_date_app):
+        last_date_app = pd.to_datetime("2022-01-01 00:00:00")
+
     # sync data to bigquery
     df = get_result_data(app, last_date_app, engine)
     print(f"Data to ingest : {len(df)}")
