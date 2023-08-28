@@ -88,6 +88,7 @@ class SentimentPredictor:
             r_ = self.model(text)[0]
             return r_["label"], r_["score"]
         else:
+            print("No text found")
             return "neutral", 0
         
     # create _preedict_text_v2 return list of dict
@@ -128,7 +129,7 @@ class SentimentPredictor:
                 df["clean_text"] = df["content"].apply(self.cleaner)
                 # count none in clean_text
                 null_df = df[df["clean_text"].notna()]
-                logger.info(f"Found {len(null_df)} null values in clean_text")
+                logger.info(f"Found {len(null_df)} good values in clean_text")
 
                 # do prediction return tuple
                 predictions = df["clean_text"].apply(self._predict_text)
