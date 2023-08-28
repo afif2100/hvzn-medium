@@ -96,7 +96,7 @@ class SentimentPredictor:
         else:
             print("No text found")
             return "neutral", 0
-        
+
     # create _preedict_text_v2 return list of dict
     def _predict_text_v2(self, text: list) -> list[dict]:
         try:
@@ -142,9 +142,7 @@ class SentimentPredictor:
                     print("predict_text_v2 error")
                     predictions = df["clean_text"].apply(self._predict_text)
 
-                df[["sentiment", "pscore"]] = pd.DataFrame(
-                    predictions.tolist(), index=df.index
-                )
+                df[["sentiment", "pscore"]] = pd.DataFrame(predictions, index=df.index)
                 insert_reviews_to_database(
                     df, db_table="sentiment", engine=self.db_engine
                 )
